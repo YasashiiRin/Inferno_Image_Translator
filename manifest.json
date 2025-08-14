@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "InfernoTranslator",
+  "version": "1.0",
+  "description": "Translate text on images using OCR",
+  "permissions": ["scripting", "activeTab", "tabs", "contextMenus"],
+  "host_permissions": ["<all_urls>"],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "images/inferno16.png",
+      "48": "images/inferno48.png",
+      "128": "images/inferno128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["scripts/content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["fonts/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self';"
+  }
+}
