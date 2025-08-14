@@ -1,0 +1,7 @@
+@font-face {
+    font-family: 'DejaVuSans';
+    src: url('DejaVuSans.ttf') format('truetype');
+  }
+  canvas {
+    pointer-events: none;
+  }
