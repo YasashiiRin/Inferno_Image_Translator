@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           const uniqueUrls = [...new Set(results[0].result)];
           console.log("Danh sách ảnh duy nhất:", uniqueUrls);
+          
           uniqueUrls.forEach(url => {
             console.log("Sending message for URL:", url);
             chrome.tabs.sendMessage(tab.id, { action: "translateImage", url }, (response) => {
