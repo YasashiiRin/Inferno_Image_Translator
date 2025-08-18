@@ -1,3 +1,14 @@
+
+// Toggle button
+document.getElementById('toggleButton').addEventListener('click', () => {
+  const button = document.getElementById('toggleButton');
+  const isEnabled = button.textContent === 'Enable Icons';
+  button.textContent = isEnabled ? 'Disable Icons' : 'Enable Icons';
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, { action: "toggleIcons", enabled: isEnabled });
+  });
+});
+
 document.addEventListener('DOMContentLoaded', () => {
   console.log("Popup loaded");
   const translateButton = document.getElementById('translateButton');
