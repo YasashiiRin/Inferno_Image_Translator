@@ -1,8 +1,7 @@
 
-let iconsEnabled = false;
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // // handle show icon and click 
+  console.log("=====> click toggle enable icon at content.js")
   if (request.action === "toggleIcons") {
     iconsEnabled = request.enabled;
     if (iconsEnabled) {
@@ -125,6 +124,7 @@ function displayTranslations(img, results) {
 }
 
 function addHoverIcons() {
+  console.log("=====> addHoverIcons")
   const images = document.querySelectorAll("img");
   images.forEach(img => {
 
