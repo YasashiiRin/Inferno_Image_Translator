@@ -1,9 +1,7 @@
 
 // Toggle button
-document.getElementById('toggleButton').addEventListener('click', () => {
-  const button = document.getElementById('toggleButton');
-  const isEnabled = button.textContent === 'Enable Icons';
-  button.textContent = isEnabled ? 'Disable Icons' : 'Enable Icons';
+document.getElementById('toggleCheckbox').addEventListener('change', (even) => {
+  const isEnabled = even.target.checked;
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, { action: "toggleIcons", enabled: isEnabled });
   });

@@ -1,73 +1,299 @@
 <!DOCTYPE html>
 <html>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
 <head>
   <title>Inferno Image Translator</title>
   <style>
-    body { width: 300px; padding: 10px; font-family: Arial; }
+    body { width: 400px; padding: 10px; font-family: Arial; border-radius: 8px; background: none;}
     select, button { margin: 5px; padding: 5px; }
+    @font-face {
+      font-family: "aerodome";
+      src: url('../fonts/Aerodome-Regular.otf') format('opentype');
+      font-weight: normal;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: "snack";
+      src: url('../fonts/SnackerComic_PerosnalUseOnly.ttf');
+      font-weight: normal;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: "aggressor";
+      src: url('../fonts/Aggressor-Outline.ttf');
+      font-weight: normal;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: "firesans";
+      src: url('../fonts/firesans/FiraSans-Regular.ttf');
+      font-weight: normal;
+      font-style: normal;
+    }
     .switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 28px;
+    }
 
-.switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
+    .switch input { 
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
 
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      -webkit-transition: .4s;
+      transition: .4s;
+    }
 
-input:checked + .slider {
-  background-color: #2196F3;
-}
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
 
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
+    input:focus + .slider {
+      box-shadow: 0 0 1px #2196F3;
+    }
 
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
+    input:checked + .slider:before {
+      -webkit-transform: translateX(26px);
+      -ms-transform: translateX(26px);
+      transform: translateX(26px);
+    }
 
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
+    /* Rounded sliders */
+    .slider.round {
+      border-radius: 34px;
+    }
 
-.slider.round:before {
-  border-radius: 50%;
-}
+    .slider.round:before {
+      border-radius: 50%;
+    }
+        
+    .container{
+      width: 400px;
+      height: 450px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      /* background: linear-gradient(135deg, #000000, #dd2476); */
+      color: white;
+    }
+    .head_icon {
+      width: 48px;
+      height: 48px;
+      background: url('../images/inferno128.png') center/contain no-repeat;
+      margin-right: 10px;
+    }
+
+    .head_text p {
+      margin: 0;
+      font-size: 23px;
+      font-weight: 600;
+      color: #37a5ff;
+      font-family: "aerodome", sans-serif;
+    }
+    .body_extension_active_page{
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border: 1px solid #cce8ff;
+      margin: 5% 8%;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .body_extension_active_page_text{
+      font-family: "firesans", sans-serif;
+      font-size: 20px;
+      color: black;
+    }
+    .body_extension_chose_model{
+      height: 60px;
+      align-items: center;
+      justify-content: space-between;
+      margin: 1% 8%;
+    }
+    .body_extension_chose_model_text p{
+      font-family: "firesans", sans-serif;
+      font-size: 13px;
+      color: rgb(122, 122, 122);
+      margin: 4px;
+    }
+    .body_extension_chose_model_select{
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      border-radius: 10px;
+    }
+    .body_extension_chose_model_select_select{
+      width: 95%;
+      border: none;
+      border-radius: 10px;
+      background: none;
+    }
+    .body_extension_chose_front_language{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 5% 8%;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .body_extension_chose_front_text{
+      width: 45%;
+    }
+    .body_extension_chose_language_text{
+      width: 45%;
+    }
+    .body_extension_settings{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 5% 8%;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .body_extension_chose_settings_setting{
+      align-items: center;
+    }
+    .set-button{
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: none;
+      border: none;
+    }
+    .set-padding{
+      padding: 0px 10px;
+    }
+    .padding-left-3px{
+      padding: 0 0 0 3px;
+    }
   </style>
 </head>
 <body>
-  <h3>Inferno Image Translator</h3>
+  <div class="container">
+    <div class="header">
+      <div class="head_icon">
+        <p></p>
+      </div>
+      <div class="head_text"><p>Inferno Translator</p></div>
+    </div>
+    <div class="body_extension">
+      <div class=body_extension_active_page>
+        <div class="body_extension_active_page_text">
+          <p>Enabled on this page</p>
+        </div>
+        <div class="body_extension_active_page_button">
+          <label class="switch">
+            <input type="checkbox" id="toggleCheckbox">
+            <span class="slider round"></span>
+          </label>
+        </div>
+      </div>
+      <div class="body_extension_chose_model">
+        <div class="body_extension_chose_model_text">
+          <p>Translation model</p>
+        </div>
+        <div class="body_extension_chose_model_select">
+          <select class="body_extension_chose_model_select_select" id="cars">
+            <option value="volvo">Gemini 1.5 Pro</option>
+            <option value="saab">Gemini 1.0 Pro</option>
+            <option value="fiat">Gemini 1.0 Flash</option>
+          </select>
+        </div>
+      </div>
+      <div class="body_extension_chose_front_language">
+        <div class="body_extension_chose_front_text set-padding">
+          <div class="body_extension_chose_model_text">
+            <p>Front family</p>
+          </div>
+          <div class="body_extension_chose_model_select">
+            <select class="body_extension_chose_model_select_select" id="front">
+              <option value="timenew">Time New Roman</option>
+              <option value="timesnew">Times New Roman</option>
+              <option value="arial">Arial</option>
+            </select>
+          </div>
+      </div>
+      <div class="body_extension_chose_language_text set-padding">
+        <div class="body_extension_chose_model_text">
+          <p>Target language</p>
+        </div>
+        <div class="body_extension_chose_model_select">
+          <select class="body_extension_chose_model_select_select" id="target_language">
+            <option value="Vietnamese">Vietnamese</option>
+            <option value="English">English</option>
+            <option value="Japanese">Japanese</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- settings -->
+    <div class="body_extension_settings set-padding">
+      <div class="body_extension_chose_settings_setting">
+        <div class="body_extension_chose_setting_button">
+          <button class="body_extension_chose_setting_button set-button">
+            <img src="../images/icons/gear-solid-full.svg" class="icon" alt="settings">
+          </button>
+        </div>
+        <div class="body_extension_chose_model_text padding-left-3px">
+          <p>Home</p>
+        </div>
+      </div>
+      <div class="body_extension_chose_settings_setting">
+        <div class="body_extension_chose_setting_button">
+          <button class="body_extension_chose_setting_button set-button">
+            <img src="../images/icons/gear-solid-full.svg" class="icon" alt="settings">
+          </button>
+        </div>
+        <div class="body_extension_chose_model_text padding-left-3px">
+          <p>Feed-B</p>
+        </div>
+      </div>
+      <div class="body_extension_chose_settings_setting">
+        <div class="body_extension_chose_setting_button">
+          <button class="body_extension_chose_setting_button set-button">
+            <img src="../images/icons/gear-solid-full.svg" class="icon" alt="settings">
+          </button>
+        </div>
+        <div class="body_extension_chose_model_text padding-left-3px">
+          <p>Setting</p>
+        </div>
+      </div>
+  </div>
+  </div>
+<!--   <h3>Inferno Image Translator</h3>
   <label for="lang">Target Language:</label>
   <select id="lang">
     <option value="vi">Vietnamese</option>
@@ -75,11 +301,7 @@ input:checked + .slider:before {
     <option value="ja">Japanese</option>
   </select>
   <button id="translateButton">Translate All Images</button>
-  <input type="checkbox" id="toggleButton" name="toggleButton" value="enableIcons">
-  <label class="switch">
-    <input type="checkbox">
-    <span class="slider round"></span>
-  </label>
-  <script src="popup.js"></script>
+  
+  <script src="popup.js"></script> -->
 </body>
 </html>
