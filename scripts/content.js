@@ -1,8 +1,7 @@
 
-let iconsEnabled = false;
-
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // // handle show icon and click 
+  console.log("=====> click toggle enable icon at content.js")
   if (request.action === "toggleIcons") {
     iconsEnabled = request.enabled;
     if (iconsEnabled) {
@@ -55,24 +54,24 @@ function displayTranslations(img, results) {
     return;
   }
 
-  // Lấy mảng OCR thực sự
+
   const ocrResults = Array.isArray(results) ? results : results.results;
   if (!ocrResults || !Array.isArray(ocrResults) || ocrResults.length === 0) {
     console.error("No valid results to draw or empty array:", ocrResults);
     return;
   }
 
-  // Xóa canvas cũ
+
   const oldCanvas = img.parentElement.querySelector(".translateCanvas");
   if (oldCanvas) oldCanvas.remove();
 
-  // Tính tỷ lệ scale
+
   const rect = img.getBoundingClientRect();
   const scaleX = rect.width / img.naturalWidth;
   const scaleY = rect.height / img.naturalHeight;
   console.log("Rect:", rect, "Natural:", img.naturalWidth, img.naturalHeight, "Scales:", { scaleX, scaleY });
 
-  // Tạo canvas overlay
+
   const canvas = document.createElement("canvas");
   canvas.className = "translateCanvas";
   Object.assign(canvas.style, {
@@ -90,7 +89,7 @@ function displayTranslations(img, results) {
   img.parentElement.appendChild(canvas);
   const ctx = canvas.getContext("2d");
 
-  // Vẽ từng box
+
   ocrResults.forEach((result, index) => {
     console.log(`Processing result[${index}]:`, result);
     if (!result.box || result.box.length !== 4) {
@@ -98,7 +97,7 @@ function displayTranslations(img, results) {
       return;
     }
 
-    // Scale tọa độ
+   
     const scaledPoints = result.box.map(([x, y]) => [x * scaleX, y * scaleY]);
     const xs = scaledPoints.map(p => p[0]);
     const ys = scaledPoints.map(p => p[1]);
@@ -107,16 +106,14 @@ function displayTranslations(img, results) {
     const x2 = Math.max(...xs);
     const y2 = Math.max(...ys);
 
-    // Vẽ khung
+
     ctx.strokeStyle = "yellow";
     ctx.lineWidth = 2;
     ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
 
-    // Đổ màu nhẹ để debug
     ctx.fillStyle = "rgba(255, 255, 0, 0.3)";
     ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
 
-    // Vẽ text
     if (result.vi?.trim()) {
       ctx.font = "20px 'Helvetica', Arial, sans-serif";
       ctx.textBaseline = "top";
@@ -127,6 +124,7 @@ function displayTranslations(img, results) {
 }
 
 function addHoverIcons() {
+  console.log("=====> addHoverIcons")
   const images = document.querySelectorAll("img");
   images.forEach(img => {
 

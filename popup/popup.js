@@ -1,14 +1,20 @@
-
 // Toggle button
-document.getElementById('toggleButton').addEventListener('click', () => {
-  const button = document.getElementById('toggleButton');
-  const isEnabled = button.textContent === 'Enable Icons';
-  button.textContent = isEnabled ? 'Disable Icons' : 'Enable Icons';
+document.getElementById('toggleCheckbox').addEventListener('change', (event) => {
+  console.log("=====> click toggle enable icon at popup.js");
+  const isEnabled = event.target.checked;
+
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, { action: "toggleIcons", enabled: isEnabled });
+    const tab = tabs[0];
+    if (tab.url.startsWith("chrome://") || tab.url.startsWith("https://chrome.google.com/webstore")) {
+      console.warn("Content scripts cannot run on this page");
+      return;
+    }
+  
+    chrome.tabs.sendMessage(tab.id, { action: "toggleIcons", enabled: isEnabled });
   });
 });
 
+// mutil request image
 document.addEventListener('DOMContentLoaded', () => {
   console.log("Popup loaded");
   const translateButton = document.getElementById('translateButton');
@@ -53,6 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
   } else {
-    console.error("Không tìm thấy nút Translate");
+    console.log("=====> All translate button not found");
   }
 });

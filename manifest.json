@@ -12,10 +12,11 @@
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {
-      "16": "images/inferno16.png",
-      "48": "images/inferno48.png",
       "128": "images/inferno128.png"
     }
+  },
+  "icons": {
+    "128": "images/inferno128.png"
   },
   "content_scripts": [
     {
@@ -26,7 +27,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["images/inferno128.png"],
+      "resources": ["images/inferno128.png", "fonts/*.otf"],
       "matches": ["<all_urls>"]
     }
   ],
