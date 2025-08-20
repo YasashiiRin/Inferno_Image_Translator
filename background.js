@@ -17,12 +17,13 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 let translationQueue = [];
 let isProcessing = false;
 
-async function fetchTranslation(imageUrl) {
+async function fetchTranslation(ImageData) {
+  console.log("=====> call fetchTranslation", ImageData)
   try {
-    const response = await fetch("http://192.168.4.194:5000/translate-image", {
+    const response = await fetch("http://192.168.4.217:5000/translate-image", {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({imageUrl})
+      body: JSON.stringify({ImageData})
     });
 
     if (!response.ok) {
@@ -43,10 +44,10 @@ async function processQueue() {
   if (isProcessing || translationQueue.length === 0) return;
   isProcessing = true;
 
-  const {imageUrl, callback} = translationQueue.shift();
-
+  const {ImageData, callback} = translationQueue.shift();
+  console.log("=====> processQueue imageData", ImageData)
   try {
-    const data = await fetchTranslation(imageUrl);
+    const data = await fetchTranslation(ImageData);
     callback(data);
   } catch (error) {
     console.error("=====> Error when process translation:", error);
@@ -61,8 +62,8 @@ async function processQueue() {
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("=====> call fetch")
   if (message.action === "fetchTranslation") {
-    translationQueue.push({imageUrl: message.imageUrl, callback: sendResponse});
-    console.log(`Đã thêm ${message.imageUrl} vào queue. Queue length: ${translationQueue.length}`);
+    translationQueue.push({ImageData: message.imageData, callback: sendResponse});
+    console.log(`Đã thêm ${message.imageData} vào queue. Queue length: ${translationQueue.length}`);
     processQueue();
 
     return true;
