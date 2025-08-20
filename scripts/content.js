@@ -1,3 +1,13 @@
+console.log("=====> content.js loaded");
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "checkTranslateIcon") {
+    const exists = !!document.querySelector(".translateIcon");
+    console.log("=====> translateIcon exists?", exists);
+    sendResponse({ exists });
+  }
+  return true;
+});
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // // handle show icon and click 
@@ -80,7 +90,7 @@ function displayTranslations(img, results) {
     left: "0",
     zIndex: "10000",
     pointerEvents: "none",
-    background: "rgba(0, 0, 255, 0.2)" // debug
+    background: "rgba(0, 0, 255, 0.2)"
   });
   canvas.width = rect.width;
   canvas.height = rect.height;
@@ -97,7 +107,6 @@ function displayTranslations(img, results) {
       return;
     }
 
-   
     const scaledPoints = result.box.map(([x, y]) => [x * scaleX, y * scaleY]);
     const xs = scaledPoints.map(p => p[0]);
     const ys = scaledPoints.map(p => p[1]);
@@ -105,24 +114,75 @@ function displayTranslations(img, results) {
     const y1 = Math.min(...ys);
     const x2 = Math.max(...xs);
     const y2 = Math.max(...ys);
+    const width = x2 - x1;
+    const height = y2 - y1;
 
+    // blur or hide original text
+    ctx.fillStyle = "rgba(255, 255, 255, 0.5)";  // background
+    ctx.fillRect(x1, y1, width, height);
 
-    ctx.strokeStyle = "yellow";
+ 
+    ctx.strokeStyle = "#FF4500";
     ctx.lineWidth = 2;
-    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+    ctx.strokeRect(x1, y1, width, height);
 
-    ctx.fillStyle = "rgba(255, 255, 0, 0.3)";
-    ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+    // text background translate
+    ctx.fillStyle = "rgba(255, 255, 255, 0.7)"; 
+    ctx.fillRect(x1 + 2, y1 + 2, width - 4, height - 4);
+    ctx.fillStyle = "black"; // black
+    ctx.font = "16px Noto Sans JP"; // todo
+    ctx.textAlign = "left";
+    ctx.textBaseline = "top";
+    ctx.fillText(result.vi.trim(), x1 + 5, y1 + 5, width - 10); // set text
 
-    if (result.vi?.trim()) {
-      ctx.font = "20px 'Helvetica', Arial, sans-serif";
-      ctx.textBaseline = "top";
-      ctx.fillStyle = "#00ff00";
-      ctx.fillText(result.vi.trim(), x1 + 5, y1 + 2);
+    // show original text
+    if (result.en) {
+      ctx.fillStyle = "rgba(255, 255, 255, 0.3)"; 
+      ctx.fillText(result.en.trim(), x1 + 5, y1 + height - 15, width - 10);
     }
   });
 }
 
+async function getImageData(img) {
+  try {
+    if (img.src.startsWith("blob:")) {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+      return canvas.toDataURL("image/png");
+    }
+
+    else if (img.src.startsWith("data:image/")) {
+      return img.src;
+    }
+
+    else if (img.src && (img.src.startsWith("http://") || img.src.startsWith("https://"))) {
+      const response = await fetch(img.src);
+      if (!response.ok) throw new Error("Failed to fetch image");
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const tempImg = new Image();
+      tempImg.src = url;
+      await new Promise(resolve => (tempImg.onload = resolve));
+      const canvas = document.createElement("canvas");
+      canvas.width = tempImg.naturalWidth;
+      canvas.height = tempImg.naturalHeight;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(tempImg, 0, 0);
+      URL.revokeObjectURL(url);
+      return canvas.toDataURL("image/png");
+    }
+  
+    else {
+      throw new Error("Unsupported image source: " + img.src);
+    }
+  } catch (error) {
+    console.error("Error in getImageData:", error);
+    return null; // Trả về null nếu lỗi
+  }
+}
 function addHoverIcons() {
   console.log("=====> addHoverIcons")
   const images = document.querySelectorAll("img");
@@ -165,9 +225,11 @@ function addHoverIcons() {
       });
 
     
-      icon.addEventListener("click", () => {
+      icon.addEventListener("click", async () => {
+        const imageData = await getImageData(img);
+        console.log("=====> click icon and show imageData", imageData);
         chrome.runtime.sendMessage(
-          { action: "fetchTranslation", imageUrl: request.url },
+          { action: "fetchTranslation", imageData},
           (data) => {
             if (!data) {
               sendResponse({ success: false, error: "No response from background" });
@@ -179,7 +241,6 @@ function addHoverIcons() {
                 displayTranslations(img, data.results);
               }
             }
-            sendResponse(data);
           }
         );
       });
