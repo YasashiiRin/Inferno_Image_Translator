@@ -26,6 +26,17 @@ except Exception as e:
 
 lp = LanguageProcessingConversion()
 
+@app.route('/translate-text', methods=['POST'])
+def translate_text():
+    try:
+        data = request.get_json()
+        text = data.get('text')
+        # translated_texts = lp.translate_text(text, "vi", "must not distort or distort the content")
+        translated_texts = lp.translate_texts_google_single(text, "vi")
+        return jsonify({"success": True, "results": translated_texts})
+    except Exception as e:
+        print("=====> error", e)
+        return jsonify({"success": False, "error": str(e)})
 
 @app.route('/translate-image', methods=['POST'])
 def translate_image():
@@ -62,7 +73,7 @@ def translate_image():
         logger.info(f"Image resized to {width}x{height}, shape: {img_np.shape}")
 
        
-        results = ocr.predict(img_np) 
+        results = ocr.ocr(img_np) 
         if not results or not results[0]:
             return jsonify({"success": False, "error": "No text detected"})
 
@@ -76,8 +87,8 @@ def translate_image():
         print("=====> rec_texts", rec_texts)
 
         # Dịch
-        translated_texts = lp.translate_text(rec_texts, "vi", "manga")
-        # translated_texts = lp.translate_texts_google(rec_texts, "vi")
+        # translated_texts = lp.translate_text_on_image(rec_texts, "vi", "manga")
+        translated_texts = lp.translate_texts_google(rec_texts, "vi")
 
       
         translated_results = []
