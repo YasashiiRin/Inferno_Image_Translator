@@ -23,6 +23,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
   }
 
+  ///handle translate text
+  console.log("=====> click toggle enable text at content.js")
+  if (request.action === "toggleTranslateText") {
+    textEnabled = request.enabled;
+    if (textEnabled) {
+      translatePage();
+    }
+  }
+
   //handle send muti image
   if (request.action === "translateImage") {
     const img = Array.from(document.querySelectorAll("img")).find(el =>
@@ -261,4 +270,53 @@ function addHoverIcons() {
 function removeIconsFromImages() {
   const icons = document.querySelectorAll(".translateIcon");
   icons.forEach(icon => icon.remove());
+}
+
+async function translatePage() {
+  console.log("=====> translatePage HTML")
+  const walker = document.createTreeWalker(
+    document.body,
+    NodeFilter.SHOW_TEXT,
+    null,
+    false
+  );
+
+  const promises = [];
+  const nodes = [];
+
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    const text = node.nodeValue.trim();
+    if (!text) continue;
+    if (text) {
+      nodes.push(node);
+      const p = new Promise((resolve) => {
+        chrome.runtime.sendMessage(
+          { action: "fetchTranslationText", text},
+          (data) => {
+            if (!data) {
+              if (!data || !data.success) {
+                resolve(text);
+                return;
+              }
+            }
+            if (data.success === true) {
+              resolve(data.results.results);
+            }else {
+
+              resolve(text); 
+            }
+          }
+        );
+      });
+      promises.push(p);
+    }
+  }
+
+  const translations = await Promise.all(promises);
+  nodes.forEach((node, i) => {
+    node.nodeValue = translations[i];
+  });
+
+  console.log("✅ Page translated!");
 }
