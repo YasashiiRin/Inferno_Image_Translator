@@ -285,20 +285,26 @@ async function translatePage() {
           parentElement &&
           (parentElement.tagName === 'STYLE' ||
            parentElement.tagName === 'SCRIPT' ||
+           parentElement.classList.contains('code-box') ||
+           parentElement.closest('.code-box') ||
            parentElement.hasAttribute('style'))
         ) {
           return NodeFilter.FILTER_REJECT;
         }
-        const text = node.nodeValue.trim();
-        if (
-          !text ||
-          /[{}\[\];#]/.test(text) ||
-          /class|def|if|for|print|var|function|append|querySelector|addEventListener|let|const|return|\b\w{2,4}\b/.test(text) ||
-          /=>|\.|\->|==|!=|<=|>=/.test(text)
-        ) {
-          console.log(`Rejected text: "${text}"`);
-          return NodeFilter.FILTER_REJECT;
-        }
+        // const text = node.nodeValue.trim();
+        // if (
+        //   !text ||
+        //   /[{}\[\];#]/.test(text) ||
+        //   /class|def|if|for|print|\b\w{2,4}\b/.test(text) ||
+        //   text.split(/\s+/).length < 2 ||
+        //   /^,/.test(text) ||
+        //   !/[.!?]$/.test(text) ||
+        //   /:[a-zA-Z]/.test(text) ||
+        //   text.length < 10
+        // ) {
+        //   console.log(`Rejected text: "${text}"`);
+        //   return NodeFilter.FILTER_REJECT;
+        // }
         return NodeFilter.FILTER_ACCEPT;
       }
     },
