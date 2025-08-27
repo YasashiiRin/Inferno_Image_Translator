@@ -273,49 +273,145 @@ function removeIconsFromImages() {
 }
 
 async function translatePage() {
-  console.log("=====> translatePage HTML")
+  console.log("=====> translatePage HTML");
+
   const walker = document.createTreeWalker(
     document.body,
     NodeFilter.SHOW_TEXT,
-    null,
+    {
+      acceptNode: (node) => {
+        const parentElement = node.parentElement;
+        if (
+          parentElement &&
+          (parentElement.tagName === 'STYLE' ||
+           parentElement.tagName === 'SCRIPT' ||
+           parentElement.hasAttribute('style'))
+        ) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        const text = node.nodeValue.trim();
+        if (
+          !text ||
+          /[{}\[\];#]/.test(text) ||
+          /class|def|if|for|print|var|function|append|querySelector|addEventListener|let|const|return|\b\w{2,4}\b/.test(text) ||
+          /=>|\.|\->|==|!=|<=|>=/.test(text)
+        ) {
+          console.log(`Rejected text: "${text}"`);
+          return NodeFilter.FILTER_REJECT;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    },
     false
   );
 
-  const promises = [];
   const nodes = [];
+  const texts = [];
 
   while (walker.nextNode()) {
     const node = walker.currentNode;
     const text = node.nodeValue.trim();
     if (!text) continue;
-    if (text) {
-      nodes.push(node);
-      const p = new Promise((resolve) => {
-        chrome.runtime.sendMessage(
-          { action: "fetchTranslationText", text},
-          (data) => {
-            if (!data) {
+    nodes.push(node);
+    texts.push(text);
+  }
+
+  if (texts.length === 0) {
+    console.log("✅ Nothing to translate!");
+    return;
+  }
+
+  // ---- helper để chia chunk với giới hạn 4000 ký tự và tối đa 10 đoạn
+  function chunkTexts(arr, limit = 4000, maxItems = 20) {
+    const chunks = [];
+    let current = [];
+    let currentLength = 0;
+
+    arr.forEach((text, idx) => {
+      const item = { idx, text };
+
+      // Kiểm tra độ dài từng đoạn
+      if (text.length > limit) {
+        console.warn(`Text at index ${idx} exceeds ${limit} characters, splitting:`, text);
+        const parts = text.match(new RegExp(`.{1,${limit}}`, "g"));
+        parts.forEach((p) => {
+          chunks.push([{ idx, text: p }]);
+        });
+        return;
+      }
+
+      // Kiểm tra số lượng đoạn và tổng độ dài
+      if (current.length >= maxItems || currentLength + text.length > limit) {
+        chunks.push(current);
+        current = [item];
+        currentLength = text.length;
+      } else {
+        current.push(item);
+        currentLength += text.length;
+      }
+    });
+
+    if (current.length) chunks.push(current);
+    return chunks;
+  }
+
+  const chunks = chunkTexts(texts, 4000, 20);
+
+  // kết quả dịch sẽ mapping index gốc
+  const translatedMap = {};
+
+  for (const chunk of chunks) {
+    const originalTexts = chunk.map((c) => c.text);
+    const totalLength = originalTexts.reduce((sum, text) => sum + text.length, 0);
+    console.log(`Processing chunk: Texts=${originalTexts}, TotalLength=${totalLength}, Count=${originalTexts.length}`);
+
+    if (totalLength > 4000) {
+      console.warn("Chunk exceeds 4000 characters, splitting further:", originalTexts);
+      const subChunks = chunkTexts(originalTexts, 4000, 10);
+      for (const subChunk of subChunks) {
+        const subOriginalTexts = subChunk.map((c) => c.text);
+        const subTotalLength = subOriginalTexts.reduce((sum, text) => sum + text.length, 0);
+        console.log(`Sub-chunk: Texts=${subOriginalTexts}, TotalLength=${subTotalLength}, Count=${subOriginalTexts.length}`);
+        const translations = await new Promise((resolve) => {
+          chrome.runtime.sendMessage(
+            { action: "fetchTranslationText", text: subOriginalTexts },
+            (data) => {
               if (!data || !data.success) {
-                resolve(text);
+                console.warn("Translation failed, using original text:", subOriginalTexts);
+                resolve(subOriginalTexts);
                 return;
               }
+              resolve(data.results.results || subOriginalTexts);
             }
-            if (data.success === true) {
-              resolve(data.results.results);
-            }else {
-
-              resolve(text); 
+          );
+        });
+        subChunk.forEach((c, i) => {
+          const originalIdx = chunk.findIndex((item) => item.idx === c.idx);
+          translatedMap[chunk[originalIdx].idx] = translations[i] || chunk[originalIdx].text;
+        });
+      }
+    } else {
+      const translations = await new Promise((resolve) => {
+        chrome.runtime.sendMessage(
+          { action: "fetchTranslationText", text: originalTexts },
+          (data) => {
+            if (!data || !data.success) {
+              console.warn("Translation failed, using original text:", originalTexts);
+              resolve(originalTexts);
+              return;
             }
+            resolve(data.results.results || originalTexts);
           }
         );
       });
-      promises.push(p);
+      chunk.forEach((c, i) => {
+        translatedMap[c.idx] = translations[i] || c.text;
+      });
     }
   }
 
-  const translations = await Promise.all(promises);
   nodes.forEach((node, i) => {
-    node.nodeValue = translations[i];
+    node.nodeValue = translatedMap[i] || texts[i];
   });
 
   console.log("✅ Page translated!");

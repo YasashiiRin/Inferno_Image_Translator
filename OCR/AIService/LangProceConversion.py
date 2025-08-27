@@ -2,8 +2,7 @@ import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 from deep_translator import GoogleTranslator
-
-
+from typing import List
 load_dotenv()
 
 class LanguageProcessingConversion:
@@ -11,6 +10,17 @@ class LanguageProcessingConversion:
         genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
         self.model = genai.GenerativeModel("gemini-1.5-flash")
 
+    def _is_valid_text(self, text: str) -> bool:
+        """Kiểm tra xem text có phải câu hợp lệ không."""
+        if not isinstance(text, str) or not text.strip():
+            return False
+        words = text.strip().split()
+        return (
+            len(words) >= 2 and
+            not text.startswith(',') and
+            any(text.endswith(p) for p in '.!?') and
+            len(text) <= 5000
+        )
     def translate_text_on_image(self, texts, target_language, storyTitle):
   
         numbered_text = "\n".join([f"{i+1}. {t}" for i, t in enumerate(texts)])
@@ -43,9 +53,26 @@ class LanguageProcessingConversion:
 
         return translated_texts
 
-    def translate_texts_google_single(self, texts, dest="vi"):
-        result = GoogleTranslator(source='auto', target=dest).translate(texts)
-        return result
+    def translate_texts_google_single(self, texts: List[str], dest: str = "vi") -> List[str]:
+        """Dịch nhiều đoạn bằng GoogleTranslator (xử lý mảng)."""
+        if not texts or not isinstance(texts, list):
+            return []
+
+        # Lọc và kiểm tra độ dài
+        valid_texts = [t for t in texts]
+        total_length = sum(len(t) for t in valid_texts)
+        if total_length > 5000:
+            raise ValueError("Total text length exceeds 5000 characters")
+
+        try:
+            translated_texts = []
+            for text in valid_texts:
+                result = GoogleTranslator(source='auto', target=dest).translate(text)
+                translated_texts.append(result)
+            return translated_texts
+        except Exception as e:
+            print(f"Error in translate_texts_google_single: {e}")
+            return valid_texts  # Trả về nguyên bản nếu lỗi
 
     def translate_text(self, texts, target_language, prom):
   
