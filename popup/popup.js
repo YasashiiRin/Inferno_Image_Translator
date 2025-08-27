@@ -31,6 +31,8 @@ document.getElementById('toggleTranslateText').addEventListener('change', (event
 //active button toggle
 document.addEventListener("DOMContentLoaded", () => {
   const toggle = document.getElementById("toggleCheckbox");
+  const selectLg = document.getElementById("target_language");
+  console.log("=====> selectLg", selectLg.value);
 
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(

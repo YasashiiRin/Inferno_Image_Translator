@@ -1,5 +1,5 @@
 
-const OCR_URL = "http://192.168.4.217:5000";
+const OCR_URL = "http://127.0.0.1:5000";
 
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
