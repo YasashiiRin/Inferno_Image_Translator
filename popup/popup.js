@@ -27,6 +27,20 @@ document.getElementById('toggleTranslateText').addEventListener('change', (event
     chrome.tabs.sendMessage(tab.id, { action: "toggleTranslateText", enabled: isEnabled });
   });
 });
+document.getElementById('toggleTranslateConvert').addEventListener('change', (event) => {
+  console.log("=====> click toggle enable text at popup.js");
+  const isEnabled = event.target.checked;
+
+  chrome.tabs.query({ active:true, currentWindow:true}, (tabs) => {
+    const tab = tabs[0];
+    if (tab.url.startsWith("chrome://") || tab.url.startsWith("https://chrome.google.com/webstore")) {
+      console.warn("Content scripts cannot run on this page");
+      return;
+    }
+
+    chrome.tabs.sendMessage(tab.id, { action: "toggleTranslateConvert", enabled: isEnabled });
+  });
+});
 
 //active button toggle
 document.addEventListener("DOMContentLoaded", () => {

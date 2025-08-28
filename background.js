@@ -19,8 +19,10 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
 });
 let translationQueue = [];
 let translationQueueText = [];
+let translationQueueConvert = [];
 let isProcessing = false;
 let isProcessingText = false;
+let isProcessingConvert = false;
 async function fetchTranslation(ImageData) {
   console.log("=====> call fetchTranslation", ImageData)
   try {
@@ -63,6 +65,28 @@ async function fetchTranslationText(text) {
     return {success: false, error: error.toString()};
   }
 }
+async function fetchTranslationConvert(text) {
+  console.log("=====> call fetchTranslationConvert", text)
+  try {
+    const response = await fetch(`${OCR_URL}/translate-convert`, {  
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({text})
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("=====> data response", data)
+    return {success: true, results: data};
+  } catch (error) {
+    console.error("=====> Error when call ORC:", error);
+    return {success: false, error: error.toString()};
+  }
+}
+
 async function processQueue() {
   console.log("=====> call processQueue")
   if (isProcessing || translationQueue.length === 0) return;
@@ -101,6 +125,24 @@ async function processQueueText() {
   }
   
 }
+async function processQueueConvert() {
+  console.log("=====> call processQueue Convert")
+  if (isProcessingConvert || translationQueueConvert.length === 0) return;
+  isProcessingConvert = true;
+
+  const {text, callback} = translationQueueConvert.shift();
+  console.log("=====> processQueue text", text)
+  try {
+    const data = await fetchTranslationConvert(text);
+    callback(data);
+  } catch (error) {
+    console.error("=====> Error when process translation:", error);
+    callback({success: false, error: error.toString()});
+  } finally {
+    isProcessingConvert = false;
+    processQueueConvert();
+  }
+}
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   console.log("=====> call fetch")
@@ -112,10 +154,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true;
   }
 
-  if (message.action === "fetchTranslationText") {
-    translationQueueText.push({text: message.text, callback:sendResponse});
-    processQueueText();
-    return true;
-  }
+    if (message.action === "fetchTranslationText") {
+      translationQueueText.push({text: message.text, callback:sendResponse});
+      processQueueText();
+      return true;
+    }
+
+    if (message.action === "fetchTranslationConvert") {
+      translationQueueConvert.push({text: message.text, callback:sendResponse});
+      processQueueConvert();
+      return true;
+    }
 
 });

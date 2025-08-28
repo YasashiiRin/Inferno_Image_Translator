@@ -21,6 +21,21 @@ load_dotenv()
 
 lp = LanguageProcessingConversion()
 
+@app.route('/translate-convert', methods=['POST'])
+def translate_convert():
+    try:
+        data = request.get_json()
+        text = data.get('text', [])
+        translated_texts = lp.translate_text(
+            text,
+            "vi"
+        )
+        print("=====> translated_texts", translated_texts)  
+        return jsonify({"success": True, "results": translated_texts})
+    except Exception as e:
+        print("=====> error", e)
+        return jsonify({"success": False, "error": str(e)})
+
 @app.route('/translate-text', methods=['POST'])
 def translate_text():
     try:

@@ -32,6 +32,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
   }
 
+  //handle translate convert
+  console.log("=====> click toggle enable convert at content.js")
+  if (request.action === "toggleTranslateConvert") {
+    convertEnabled = request.enabled;
+    if (convertEnabled) {
+      translateConvert("BNS");
+    }
+  }
+
   //handle send muti image
   if (request.action === "translateImage") {
     const img = Array.from(document.querySelectorAll("img")).find(el =>
@@ -420,9 +429,23 @@ async function translatePage() {
 
 function translateConvert(type ){
   if (type == "BNS"){
-    const html = document.getElementById("noi-dung").outerHTML;
-    const parent = html.parentElement;
+    const html = document.getElementById("noi-dung");
 
-    console.log("=====> html", html);
+    chrome.runtime.sendMessage(
+      { action: "fetchTranslationConvert", text: html.outerHTML},
+      (data) => {
+        if (!data) {
+          sendResponse({ success: false, error: "No response from background" });
+          return;
+        }
+        if (data.success) {
+          if (data.results.success == true) {
+            console.log("=====> data.results form api convert", data.results)
+            const newHtml = data.results.results[0];
+            html.innerHTML = newHtml;
+          }
+        }
+      }
+    );
   }
 }

@@ -74,17 +74,17 @@ class LanguageProcessingConversion:
             print(f"Error in translate_texts_google_single: {e}")
             return valid_texts  # Trả về nguyên bản nếu lỗi
 
-    def translate_text(self, texts, target_language, prom):
-  
-        context = f"'{prom}'." if prom else ""
-        print("context.....................................", context)
+    def translate_text(self, texts, target_language):
         prompt = (
-            f"{context} Translate the following numbered English sentences into {target_language}. "
+            f"The following text is translated from Chinese to Vietnamese, "
+            "so it may contain unnatural word order or grammar that follows Chinese style. "
+            "Your task is to rearrange and rewrite it into natural and fluent Vietnamese, "
+            "without changing the meaning and while preserving all original HTML tags. "
+            f"Text: {texts}"
         )
         print("prompt", prompt)
         response = self.model.generate_content([prompt], stream=False)
-
-        translations = []       
-
-        translations.append(response)
+        result_text = response.text if hasattr(response, "text") else str(response)
+        translations = []
+        translations.append(result_text)
         return translations
