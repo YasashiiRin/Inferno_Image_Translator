@@ -120,6 +120,9 @@
       color: #37a5ff;
       font-family: "aerodome", sans-serif;
     }
+    .body_extension.hidden {
+      display: none;
+    }
     .body_extension_active_page{
       height: 30px;
       display: flex;
@@ -182,7 +185,13 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     .body_extension_chose_settings_setting{
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
       align-items: center;
+    }
+    .body_extension_chose_setting_button.set-button.active{
+      border: 1px solid #ff3f25;
     }
     .set-button{
       width: 40px;
@@ -200,113 +209,216 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <div class="head_icon">
-        <p></p>
+    <div class="container">
+      <div class="header">
+        <div class="head_icon">
+          <p></p>
+        </div>
+        <div class="head_text"><p>Inferno Translator</p></div>
       </div>
-      <div class="head_text"><p>Inferno Translator</p></div>
-    </div>
-    <div class="body_extension">
-      <div class=body_extension_active_page>
-        <div class="body_extension_active_page_text">
-          <p>Enabled on this page</p>
+  
+      <!-- Trang active -->
+      <div class="body_extension active-image">
+        <div class="body_extension_active_page">
+          <div class="body_extension_active_page_text">
+            <p>Enabled on this page</p>
+          </div>
+          <div class="body_extension_active_page_button">
+            <label class="switch">
+              <input type="checkbox" id="toggleCheckbox">
+              <span class="slider round"></span>
+            </label>
+          </div>
         </div>
-        <div class="body_extension_active_page_button">
-          <label class="switch">
-            <input type="checkbox" id="toggleCheckbox">
-            <span class="slider round"></span>
-          </label>
-        </div>
-      </div>
-
-      <div class=body_extension_active_page>
-        <div class="body_extension_active_page_text">
-          <p>Enable trans text</p>
-        </div>
-        <div class="body_extension_active_page_button">
-          <label class="switch">
-            <input type="checkbox" id="toggleTranslateText">
-            <span class="slider round"></span>
-          </label>
-        </div>
-      </div>
-
-
-      <div class="body_extension_chose_model">
-        <div class="body_extension_chose_model_text">
-          <p>Translation model</p>
-        </div>
-        <div class="body_extension_chose_model_select">
-          <select class="body_extension_chose_model_select_select" id="cars">
-            <option value="volvo">Gemini 1.5 Pro</option>
-            <option value="saab">Gemini 1.0 Pro</option>
-            <option value="fiat">Gemini 1.0 Flash</option>
-          </select>
-        </div>
-      </div>
-      <div class="body_extension_chose_front_language">
-        <div class="body_extension_chose_front_text set-padding">
+  
+        <div class="body_extension_chose_model">
           <div class="body_extension_chose_model_text">
-            <p>Front family</p>
+            <p>Translation model</p>
           </div>
           <div class="body_extension_chose_model_select">
-            <select class="body_extension_chose_model_select_select" id="front">
-              <option value="timenew">Time New Roman</option>
-              <option value="timesnew">Times New Roman</option>
-              <option value="arial">Arial</option>
+            <select class="body_extension_chose_model_select_select" id="cars">
+              <option value="volvo">Gemini 1.5 Pro</option>
+              <option value="saab">Gemini 1.0 Pro</option>
+              <option value="fiat">Gemini 1.0 Flash</option>
             </select>
           </div>
-      </div>
-      <div class="body_extension_chose_language_text set-padding">
-        <div class="body_extension_chose_model_text">
-          <p>Target language</p>
         </div>
-        <div class="body_extension_chose_model_select">
-          <select class="body_extension_chose_model_select_select" id="target_language">
-            <option value="Vietnamese">Vietnamese</option>
-            <option value="English">English</option>
-            <option value="Japanese">Japanese</option>
-          </select>
+  
+        <div class="body_extension_chose_front_language">
+          <div class="body_extension_chose_front_text set-padding">
+            <div class="body_extension_chose_model_text">
+              <p>Front family</p>
+            </div>
+            <div class="body_extension_chose_model_select">
+              <select class="body_extension_chose_model_select_select" id="front">
+                <option value="timenew">Time New Roman</option>
+                <option value="timesnew">Times New Roman</option>
+                <option value="arial">Arial</option>
+              </select>
+            </div>
+          </div>
+          <div class="body_extension_chose_language_text set-padding">
+            <div class="body_extension_chose_model_text">
+              <p>Target language</p>
+            </div>
+            <div class="body_extension_chose_model_select">
+              <select class="body_extension_chose_model_select_select" id="target_language">
+                <option value="Vietnamese">Vietnamese</option>
+                <option value="English">English</option>
+                <option value="Japanese">Japanese</option>
+              </select>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+        </div>
 
+              <!-- translate page -->
+      <div class="body_extension active-page hidden">
+  
+        <div class="body_extension_active_page">
+          <div class="body_extension_active_page_text">
+            <p>Enable trans text</p>
+          </div>
+          <div class="body_extension_active_page_button">
+            <label class="switch">
+              <input type="checkbox" id="toggleTranslateText">
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+  
+        <div class="body_extension_chose_model">
+          <div class="body_extension_chose_model_text">
+            <p>Translation model</p>
+          </div>
+          <div class="body_extension_chose_model_select">
+            <select class="body_extension_chose_model_select_select" id="cars">
+              <option value="volvo">Gemini 1.5 Pro</option>
+              <option value="saab">Gemini 1.0 Pro</option>
+              <option value="fiat">Gemini 1.0 Flash</option>
+            </select>
+          </div>
+        </div>
+  
+        <div class="body_extension_chose_front_language">
+          <div class="body_extension_chose_front_text set-padding">
+            <div class="body_extension_chose_model_text">
+              <p>Front family</p>
+            </div>
+            <div class="body_extension_chose_model_select">
+              <select class="body_extension_chose_model_select_select" id="front">
+                <option value="timenew">Time New Roman</option>
+                <option value="timesnew">Times New Roman</option>
+                <option value="arial">Arial</option>
+              </select>
+            </div>
+          </div>
+          <div class="body_extension_chose_language_text set-padding">
+            <div class="body_extension_chose_model_text">
+              <p>Target language</p>
+            </div>
+            <div class="body_extension_chose_model_select">
+              <select class="body_extension_chose_model_select_select" id="target_language">
+                <option value="Vietnamese">Vietnamese</option>
+                <option value="English">English</option>
+                <option value="Japanese">Japanese</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        </div>
 
-    <!-- settings -->
-    <div class="body_extension_settings set-padding">
-      <div class="body_extension_chose_settings_setting">
-        <div class="body_extension_chose_setting_button">
-          <button class="body_extension_chose_setting_button set-button">
-            <img src="../images/icons/gear-solid-full.svg" class="icon" alt="settings">
-          </button>
+              <!-- translate convert-->
+      <div class="body_extension active-convert hidden">
+  
+        <div class="body_extension_active_page">
+          <div class="body_extension_active_page_text">
+            <p>Enable trans convert</p>
+          </div>
+          <div class="body_extension_active_page_button">
+            <label class="switch">
+              <input type="checkbox" id="toggleTranslateText">
+              <span class="slider round"></span>
+            </label>
+          </div>
         </div>
-        <div class="body_extension_chose_model_text padding-left-3px">
-          <p>Home</p>
+  
+        <div class="body_extension_chose_model">
+          <div class="body_extension_chose_model_text">
+            <p>Translation model</p>
+          </div>
+          <div class="body_extension_chose_model_select">
+            <select class="body_extension_chose_model_select_select" id="cars">
+              <option value="volvo">Gemini 1.5 Pro</option>
+              <option value="saab">Gemini 1.0 Pro</option>
+              <option value="fiat">Gemini 1.0 Flash</option>
+            </select>
+          </div>
+        </div>
+  
+        <div class="body_extension_chose_front_language">
+          <div class="body_extension_chose_front_text set-padding">
+            <div class="body_extension_chose_model_text">
+              <p>Front family</p>
+            </div>
+            <div class="body_extension_chose_model_select">
+              <select class="body_extension_chose_model_select_select" id="front">
+                <option value="timenew">Time New Roman</option>
+                <option value="timesnew">Times New Roman</option>
+                <option value="arial">Arial</option>
+              </select>
+            </div>
+          </div>
+          <div class="body_extension_chose_language_text set-padding">
+            <div class="body_extension_chose_model_text">
+              <p>Target language</p>
+            </div>
+            <div class="body_extension_chose_model_select">
+              <select class="body_extension_chose_model_select_select" id="target_language">
+                <option value="Vietnamese">Vietnamese</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="body_extension_chose_settings_setting">
-        <div class="body_extension_chose_setting_button">
-          <button class="body_extension_chose_setting_button set-button">
-            <img src="../images/icons/gear-solid-full.svg" class="icon" alt="settings">
-          </button>
-        </div>
-        <div class="body_extension_chose_model_text padding-left-3px">
-          <p>Feed-B</p>
+        <!-- Settings -->
+        <div class="body_extension_settings set-padding">
+          <div class="body_extension_chose_settings_setting">
+            <div class="body_extension_chose_setting_button">
+              <button class="body_extension_chose_setting_button translate-image set-button active">
+                <img src="../images/icons/hippo-solid-full.svg" class="icon" alt="settings">
+              </button>
+            </div>
+            <div class="body_extension_chose_model_text padding-left-3px">
+              <p>Translate Image</p>
+            </div>
+          </div>
+    
+          <div class="body_extension_chose_settings_setting">
+            <div class="body_extension_chose_setting_button">
+              <button class="body_extension_chose_setting_button translate-page set-button">
+                <img src="../images/icons/otter-solid-full.svg" class="icon" alt="settings">
+              </button>
+            </div>
+            <div class="body_extension_chose_model_text padding-left-3px">
+              <p>Translate page</p>
+            </div>
+          </div>
+    
+          <div class="body_extension_chose_settings_setting">
+            <div class="body_extension_chose_setting_button">
+              <button class="body_extension_chose_setting_button story-convert set-button">
+                <img src="../images/icons/translate_convert.svg" class="icon" alt="settings">
+              </button>
+            </div>
+            <div class="body_extension_chose_model_text padding-left-3px">
+              <p>Story convert</p>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="body_extension_chose_settings_setting">
-        <div class="body_extension_chose_setting_button">
-          <button class="body_extension_chose_setting_button set-button">
-            <img src="../images/icons/gear-solid-full.svg" class="icon" alt="settings">
-          </button>
-        </div>
-        <div class="body_extension_chose_model_text padding-left-3px">
-          <p>Setting</p>
-        </div>
       </div>
   </div>
-  </div>
-  <script src="popup.js"></script>
+    <script src="popup.js"></script>
 </body>
 </html>

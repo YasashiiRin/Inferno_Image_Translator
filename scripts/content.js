@@ -257,15 +257,10 @@ function addHoverIcons() {
   });
 }
 
-// document.addEventListener("DOMContentLoaded", addHoverIcons);
-// const observer = new MutationObserver((mutations) => {
-//   mutations.forEach((mutation) => {
-//     if (mutation.addedNodes.length) {
-//       addHoverIcons();
-//     }
-//   });
-// });
-// observer.observe(document.body, { childList: true, subtree: true });
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("=====> DOMContentLoaded");
+});
+
 
 function removeIconsFromImages() {
   const icons = document.querySelectorAll(".translateIcon");
@@ -421,4 +416,13 @@ async function translatePage() {
   });
 
   console.log("✅ Page translated!");
+}
+
+function translateConvert(type ){
+  if (type == "BNS"){
+    const html = document.getElementById("noi-dung").outerHTML;
+    const parent = html.parentElement;
+
+    console.log("=====> html", html);
+  }
 }
