@@ -76,10 +76,13 @@ class LanguageProcessingConversion:
 
     def translate_text(self, texts, target_language):
         prompt = (
-            f"The following text is translated from Chinese to Vietnamese, "
-            "so it may contain unnatural word order or grammar that follows Chinese style. "
-            "Your task is to rearrange and rewrite it into natural and fluent Vietnamese, "
-            "without changing the meaning and while preserving all original HTML tags. "
+            f"The following text was translated from Chinese to Vietnamese, "
+            "so some sentences may have unnatural word order or grammar that follows Chinese style. "
+            "Your task is to ONLY adjust those sentences that sound unnatural, "
+            "to make them fluent Vietnamese, while strictly keeping the original meaning "
+            "and preserving all HTML tags. "
+            "If a sentence already sounds natural in Vietnamese, leave it unchanged. "
+            "Do not add or remove content, do not alter the character's personality or tone. "
             f"Text: {texts}"
         )
         print("prompt", prompt)

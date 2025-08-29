@@ -11,12 +11,45 @@ import logging
 import base64
 import re
 import json
+from config.database import init_db, db
+from Model.license import License
+from config.database import db
+from Model.license import License
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
+logger = logging.getLogger(__name__)
 app = Flask(__name__)
 load_dotenv()
+
+# ===== Database =====
+init_db(app)
+# ===== API =====
+@app.route("/api/check_license", methods=["POST"])
+def check_license():
+    data = request.json
+    email = data.get("email")
+    license_key = data.get("license_key")
+
+    lic = License.query.filter_by(email=email, license_key=license_key, active=True).first()
+    if lic:
+        return jsonify({"valid": True})
+    return jsonify({"valid": False}), 403
+
+
+@app.route("/api/register_license", methods=["POST"])
+def register_license():
+    data = request.json
+    email = data.get("email")
+    license_key = data.get("license_key")
+
+    if License.query.filter_by(email=email).first():
+        return jsonify({"error": "Email already registered"}), 400
+
+    new_license = License(email=email, license_key=license_key)
+    db.session.add(new_license)
+    db.session.commit()
+    return jsonify({"message": "License registered"})
 
 
 lp = LanguageProcessingConversion()
@@ -131,4 +164,5 @@ def translate_image():
         return jsonify({"success": False, "error": str(e)})
 
 if __name__ == "__main__":
+    db.create_all()
     app.run(host='0.0.0.0', port=5000, debug=False, use_reloader=False)
